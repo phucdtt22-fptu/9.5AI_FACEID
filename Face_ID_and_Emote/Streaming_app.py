@@ -32,7 +32,7 @@ class EmotionDetector(nn.Module):
         self.cnn7_bn = nn.BatchNorm2d(256)
         self.fc1 = nn.Linear(1024, 512)
         self.fc2 = nn.Linear(512, 256)
-        self.fc3 = nn.Linear(256, 3)
+        self.fc3 = nn.Linear(256, 7)
         self.dropout = nn.Dropout(0.3)
         self.log_softmax = nn.LogSoftmax(dim=1)
 
@@ -72,7 +72,7 @@ def Stream(video_source, face_model,emote_model, mtcnn, csv_path, device, cascad
     df = pd.read_csv(csv_path)
     stored_features = torch.tensor(df.drop('Name', axis=1).values).to(device)
     names = df['Name'].values
-    emotion_dict = ['happy','neutral','sad']
+    emotion_dict = ['neutral', 'happy', 'surprised', 'sad', 'anger', 'disgusted', 'fearful']
     val_transform = transforms.Compose([
     transforms.ToTensor()])
     face_cascade = cv2.CascadeClassifier(cascade_path)
@@ -159,7 +159,7 @@ def main():
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     mtcnn = MTCNN(image_size=160, margin=0, min_face_size=20, post_process=True, device = device) # Define MTCNN module
     face_model = InceptionResnetV1(pretrained='vggface2',device=device).eval()
-    emote_model = load_trained_model(os.path.join(current_dir, 'Emotion_Detection_New.pt')).to(device)
+    emote_model = load_trained_model(os.path.join(current_dir, 'Emotion_Detection_Ver2.pt')).to(device)
     Stream(0,face_model,emote_model,mtcnn,path_to_csv,device,path_to_cascade) #0 is the default camera (webcam
 
 
